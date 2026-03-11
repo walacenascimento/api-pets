@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto'
 
 import { pets } from './pets.js'
+import { validaCamposMidlleware } from './midlleware.js'
 
 
 dotenv.config();
@@ -66,7 +67,7 @@ app.get("/pets/:id", (req, res) =>{
 
 // ROTA POST - Criar um novo pet
 // /pets
-app.post("/pets", (req, res) => {
+app.post("/pets", [validaCamposMidlleware], (req, res) => {
     try {
         // Entrada
         const { nome, raca, idade, nomeTutor } = req.body;
@@ -86,7 +87,7 @@ app.post("/pets", (req, res) => {
         res.status(201).send({
             Ok: true,
             Mensagem: "Novo pet criado com sucesso!",
-            Dados: pets
+            Dados: novoPet
         });
 
     } catch (error) {
@@ -99,7 +100,7 @@ app.post("/pets", (req, res) => {
 
 // ROTA PUT - Atualiza um pet
 // /pets/:id
-app.put("/pets/:id", (req, res) => {
+app.put("/pets/:id", [validaCamposMidlleware], (req, res) => {
     try {
         // entrada
         const { id } = req.params;
