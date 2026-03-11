@@ -14,23 +14,8 @@ app.use(cors());
 
 // Aqui será definido as rotas
 // ROTA PADRÃO / lista todos os dados da API
+// /
 app.get("/", (req, res) => {
-    try {
-        res.status(200).json({
-        Ok: true,
-        Mensagem: "Rota GET/ primeira rota da API-PETS"
-    })
-        
-    } catch (error) {
-        res.status(500).send({
-            Ok: false,
-            Mensage: error.toString()
-        });
-    }
-});
-
-// ROTA GET - Lista todos o pets
-app.get("/pets", (req, res) =>{
     try {
         res.status(200).send({
             Ok: true,
@@ -46,7 +31,41 @@ app.get("/pets", (req, res) =>{
     };
 });
 
+// ROTA GET/ID - Lista o pets pelo id
+// /get/:id
+app.get("/pets/:id", (req, res) =>{
+    try {
+        // entrada
+        const { id } = req.params
+
+        // processamento
+        const pet = pets.find(item => item.id === id);
+        if(!pet) {
+            res.status(404).send({
+                Ok: false,
+                Mensagem: "Pet não foi encontrado"
+            });
+        }
+
+        // saída
+        res.status(200).send({
+            Ok: true,
+            Mensagem: "Pet obtido com sucesso!",
+            Dados: pet
+        });
+
+        
+    } catch (error) {
+        res.status(500).send({
+            Ok: false,
+            Mensagem: "Algo deu errado no servidor!"
+        });
+    }
+
+});
+
 // ROTA POST - Criar um novo pet
+// /pets
 app.post("/pets", (req, res) => {
     try {
         // Entrada
@@ -70,6 +89,83 @@ app.post("/pets", (req, res) => {
             Dados: pets
         });
 
+    } catch (error) {
+        res.status(500).send({
+            Ok: false,
+            Mensagem: error.toString()
+        });
+    }
+});
+
+// ROTA PUT - Atualiza um pet
+// /pets/:id
+app.put("/pets/:id", (req, res) => {
+    try {
+        // entrada
+        const { id } = req.params;
+        const { nome, raca, idade, nomeTutor } = req.body
+
+        // Processamento
+        const petAtualizado = pets.find(item => item.id === id); // buscando um pet pelo id
+        if(!petAtualizado){
+            res.status(400).send({
+                Ok: false,
+                Mensagem: "Pet não encontrado!"
+            });
+        }
+
+        petAtualizado.nome = nome,
+        petAtualizado.raca = raca,
+        petAtualizado.idade = idade,
+        petAtualizado.nomeTutor = nomeTutor
+
+        //saida
+        res.status(201).send({
+            Ok: true,
+            Mensagem: "Pet atualizado com sucesso!",
+            Dados: petAtualizado
+        });
+
+        res.status(201).send({
+            Ok: true,
+            Mensagem: "Pet atualizado com sucesso!",
+            Dados: petatualizado
+        });
+
+        
+    } catch (error) {
+        res.status(400).send({
+            Ok: false,
+            Mensagem: error.toString()
+        });
+    }
+});
+
+// ROTA DELETE - Exclui um pet 
+// /pets/:id
+app.delete("/pets/:id", (req, res) => {
+    try {
+        // entrada
+        const { id } = req.params;
+
+        //Processamento
+        const petIndex = pets.findIndex(item => item.id === id);
+        if(petIndex < 0){
+            res.status(404).send({
+                Ok: false,
+                Mensagem: "Pet informado não existe ou não foi encontrado!"
+            });
+        }
+
+        pets.splice(petIndex, 1);
+
+        // Saída
+        res.status(200).send({
+            Ok: true,
+            Mensagem: "Pet excluído com sucesso!",
+            Dados: pets
+        });
+        
     } catch (error) {
         res.status(500).send({
             Ok: false,
